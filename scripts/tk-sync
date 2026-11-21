@@ -1,0 +1,181 @@
+#!/usr/bin/env bash
+# tk-sync — Sincroniza metadados de vídeos do TikTok (rápido, sem download)
+# Registra na planilha com status=pending. O download é feito pelo tk-download.
+#
+# Uso:
+#   tk-sync <@usuario> [opções]
+#
+# Exemplos:
+#   tk-sync @canal                          # Sincroniza todos os vídeos novos
+#   tk-sync @canal --last 50               # Últimos 50 vídeos
+#   tk-sync @canal --start 1623            # A partir da posição 1623
+#   tk-sync @canal --since 2025-01-01      # Desde uma data
+#   tk-sync @canal --dry-run               # Só lista, não registra
+
+set -euo pipefail
+
+export PATH="$HOME/.local/bin:$HOME/.deno/bin:/usr/bin:$HOME/.npm-global/bin:$PATH"
+
+# --- Config ---
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ENV_FILE="${PROJECT_DIR}/config/.env"
+if [[ -f "$ENV_FILE" ]]; then
+  set -a; source "$ENV_FILE"; set +a
+fi
+
+source "${SCRIPT_DIR}/lib-sheets.sh"
+
+CHANNEL=""
+LAST=""
+START=""
+SINCE=""
+UNTIL=""
+ORDER="newest"
+DRY_RUN=false
+SHEET_VIDEOS="VIDEOS"
+
+# --- Parse args ---
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --last)       LAST="$2"; shift 2 ;;
+    --start)      START="$2"; shift 2 ;;
+    --since)      SINCE="$2"; shift 2 ;;
+    --until)      UNTIL="$2"; shift 2 ;;
+    --order)      ORDER="$2"; shift 2 ;;
+    --dry-run)    DRY_RUN=true; shift ;;
+    --help|-h)
+      head -14 "$0" | tail -12
+      echo ""
+      echo "Opções:"
+      echo "  --last N        Limitar a N vídeos"
+      echo "  --start N       Começar na posição N da playlist"
+      echo "  --since DATA    Filtrar desde DATA (YYYY-MM-DD)"
+      echo "  --until DATA    Filtrar até DATA (YYYY-MM-DD)"
+      echo "  --order ORDEM   newest (padrão) ou oldest"
+      echo "  --dry-run       Só lista, não registra"
+      exit 0
+      ;;
+    -*)
+      echo "Erro: opção desconhecida: $1" >&2
+      exit 1
+      ;;
+    *)
+      CHANNEL="$1"; shift ;;
+  esac
+done
+
+if [[ -z "$CHANNEL" ]]; then
+  echo "Erro: forneça o @usuario do TikTok" >&2
+  exit 1
+fi
+
+[[ "$CHANNEL" != @* ]] && CHANNEL="@${CHANNEL}"
+TIKTOK_URL="https://www.tiktok.com/${CHANNEL}"
+
+# --- Carrega IDs já registrados ---
+echo "==> [1/2] Carregando vídeos já registrados..."
+SYNCED_IDS=$(sheets_get "${SHEET_VIDEOS}!A:A" 2>/dev/null | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    for row in data.get('values', []):
+        if row: print(row[0])
+except: pass
+" 2>/dev/null)
+
+is_synced() {
+  echo "$SYNCED_IDS" | grep -qF "$1"
+}
+
+# --- Busca metadados (rápido com --flat-playlist) ---
+echo "==> [2/2] Listando vídeos de ${CHANNEL}..."
+
+YTDLP_OPTS=(--flat-playlist --dump-json --no-download)
+
+if [[ -n "$START" ]]; then
+  YTDLP_OPTS+=(--playlist-start "$START")
+fi
+if [[ -n "$LAST" ]]; then
+  YTDLP_OPTS+=(--playlist-end "$LAST")
+fi
+
+METADATA_RAW=$(yt-dlp "${YTDLP_OPTS[@]}" "$TIKTOK_URL" 2>/dev/null) || {
+  echo "Erro: não foi possível listar vídeos de ${CHANNEL}" >&2
+  exit 1
+}
+
+# Se ordem oldest, inverte
+if [[ "$ORDER" == "oldest" ]]; then
+  METADATA_RAW=$(echo "$METADATA_RAW" | tac)
+fi
+
+TOTAL=0
+NOVOS=0
+PULADOS=0
+
+while IFS= read -r line; do
+  [[ -z "$line" ]] && continue
+
+  video_id=$(echo "$line" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('id',''))" 2>/dev/null)
+  [[ -z "$video_id" ]] && continue
+
+  title=$(echo "$line" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('title','sem título'))" 2>/dev/null)
+  webpage_url="https://www.tiktok.com/@${CHANNEL#@}/video/${video_id}"
+
+  TOTAL=$((TOTAL + 1))
+
+  # Já registrado?
+  if is_synced "$video_id"; then
+    PULADOS=$((PULADOS + 1))
+    continue
+  fi
+
+  if [[ "$DRY_RUN" == "true" ]]; then
+    echo "  [new] ${video_id} | ${title:0:60}"
+    NOVOS=$((NOVOS + 1))
+    continue
+  fi
+
+  # Registra na planilha com status=pending (sem baixar)
+  local_date=$(date '+%Y-%m-%d %H:%M')
+  values=$(python3 -c "
+import json
+row = [[
+    '$video_id',
+    $(python3 -c "import json; print(json.dumps('''$title'''))"),
+    '',
+    '$CHANNEL',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '$webpage_url',
+    'pending',
+    '$local_date',
+    ''
+]]
+print(json.dumps(row))
+" 2>/dev/null)
+
+  sheets_append "${SHEET_VIDEOS}!A:N" "$values" >/dev/null 2>&1
+  NOVOS=$((NOVOS + 1))
+
+  # Feedback a cada 50
+  if (( NOVOS % 50 == 0 )); then
+    echo "  ... ${NOVOS} registrados"
+  fi
+
+done <<< "$METADATA_RAW"
+
+echo ""
+echo "=== Sync completo ==="
+echo "  Canal:       ${CHANNEL}"
+echo "  Total:       ${TOTAL} vídeos encontrados"
+echo "  Novos:       ${NOVOS} registrados (pending)"
+echo "  Já tinham:   ${PULADOS} pulados"
+if [[ "$DRY_RUN" == "true" ]]; then
+  echo "  (modo dry-run)"
+fi
