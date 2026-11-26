@@ -270,7 +270,7 @@
       </div>
       <div class="config-row">
         <label>Canal YouTube</label>
-        <input type="text" id="cfg-youtube-channel" placeholder="@InemaTIA" onchange="saveConfig('youtube_channel_name', this.value)">
+        <input type="text" id="cfg-youtube-channel" placeholder="@ARCKHÉTIA" onchange="saveConfig('youtube_channel_name', this.value)">
       </div>
       <div class="config-row">
         <label>Instagram Reels</label>
@@ -524,7 +524,7 @@ async function loadConfigPage() {
   // Origem/Destinos
   setVal('cfg-tiktok-channel', config.tiktok_channel || '@lnema.tia');
   setVal('cfg-dest-youtube', config.dest_youtube || 'true');
-  setVal('cfg-youtube-channel', config.youtube_channel_name || '@InemaTIA');
+  setVal('cfg-youtube-channel', config.youtube_channel_name || '@ARCKHÉTIA');
   setVal('cfg-dest-instagram', config.dest_instagram || 'false');
   setVal('cfg-instagram-account', config.instagram_account || '');
 
@@ -915,7 +915,7 @@ async function loadFlowBar() {
     const config = await api('/api/config');
     const origin = config.tiktok_channel || '@lnema.tia';
     const ytActive = config.dest_youtube !== 'false';
-    const ytName = config.youtube_channel_name || '@InemaTIA';
+    const ytName = config.youtube_channel_name || '@ARCKHÉTIA';
     const igActive = config.dest_instagram === 'true';
     const igName = config.instagram_account || 'Instagram';
 

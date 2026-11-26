@@ -99,7 +99,7 @@ curl -s -X PUT \
     "majorDimension": "ROWS",
     "values": [
       ["chave","valor"],
-      ["tiktok_channel","@inema.tia"],
+      ["tiktok_channel","@ARCKHÉ.tia"],
       ["sync_auto","false"],
       ["sync_horarios","08:00,20:00"],
       ["sync_max_por_vez","10"],
