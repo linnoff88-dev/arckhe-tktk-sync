@@ -213,7 +213,7 @@
       <div class="value" id="mr-yt-title"></div>
     </div>
     <div class="modal-field">
-      <label>Descrição YouTube</label>
+      <label>Descriçêo YouTube</label>
       <div class="value" id="mr-yt-desc"></div>
     </div>
     <div class="modal-field">
@@ -288,7 +288,7 @@
     <!-- Sync Automático -->
     <div class="config-section">
       <h3>Sync Automático de Novos</h3>
-      <p style="color:#888;font-size:13px;margin-bottom:14px;">Busca 1x por dia vídeos novos do TikTok. Só baixa os que ainda não foram sincronizados.</p>
+      <p style="color:#888;font-size:13px;margin-bottom:14px;">Busca 1x por dia vídeos novos do TikTok. Só baixa os que ainda nêo foram sincronizados.</p>
       <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
         <div class="field">
           <label style="font-size:12px;color:#888">Status</label>
@@ -347,7 +347,7 @@
     <div class="config-section">
       <h3>Geral</h3>
       <div class="config-row">
-        <label>Privacy padrão</label>
+        <label>Privacy padrêo</label>
         <select id="cfg-privacy" onchange="saveConfig('privacy_padrao', this.value)">
           <option value="unlisted">Unlisted</option>
           <option value="public">Public</option>
@@ -359,14 +359,14 @@
         <input type="number" id="cfg-sync-max" value="10" min="1" max="100" style="max-width:80px" onchange="saveConfig('sync_max_por_vez', this.value)">
       </div>
       <div class="config-row">
-        <label>Max vídeos por publicação</label>
+        <label>Max vídeos por publicaçêo</label>
         <input type="number" id="cfg-pub-max" value="3" min="1" max="50" style="max-width:80px" onchange="saveConfig('pub_max_por_vez', this.value)">
       </div>
     </div>
 
     <!-- Horários Publish -->
     <div class="config-section">
-      <h3>Horários de Publicação</h3>
+      <h3>Horários de Publicaçêo</h3>
       <div class="config-row">
         <label>Pipeline publish</label>
         <select id="cfg-pub-paused" onchange="saveConfig('pipeline_pub_paused', this.value)">
@@ -376,7 +376,7 @@
       </div>
       <div style="margin-top:8px;">
         <div class="hour-picker-header">
-          <label>Horários de publicação (clique para ativar/desativar)</label>
+          <label>Horários de publicaçêo (clique para ativar/desativar)</label>
           <div class="hour-picker-actions">
             <button onclick="hourPickerSelectAll('pub')">Todas</button>
             <button onclick="hourPickerClearAll('pub')">Limpar</button>
@@ -456,7 +456,7 @@
       <textarea class="prompt-editor" id="cfg-prompt" spellcheck="false"></textarea>
       <div class="prompt-actions">
         <span class="saved-msg" id="prompt-saved">Salvo</span>
-        <button class="btn btn-secondary btn-sm" onclick="resetPrompt()">Restaurar padrão</button>
+        <button class="btn btn-secondary btn-sm" onclick="resetPrompt()">Restaurar padrêo</button>
         <button class="btn btn-primary btn-sm" onclick="savePrompt()">Salvar prompt</button>
       </div>
     </div>
@@ -469,18 +469,18 @@ const API = '';
 
 const DEFAULT_PROMPT = `Você é um especialista em conteúdo para redes sociais.
 
-Analise o vídeo do TikTok abaixo e gere conteúdo otimizado para republicação.
+Analise o vídeo do TikTok abaixo e gere conteúdo otimizado para republicaçêo.
 
 DADOS DO VÍDEO ORIGINAL:
 - Título: {title}
-- Descrição: {description}
-- Duração: {duration}s
+- Descriçêo: {description}
+- Duraçêo: {duration}s
 - Views: {view_count} | Likes: {like_count}
 
 GERE (em JSON):
 {
   "titulo_youtube": "Título para YouTube Shorts (max 100 chars, atrativo, com emoji)",
-  "descricao_youtube": "Descrição para YouTube (2-3 parágrafos, com hashtags relevantes, CTA)",
+  "descricao_youtube": "Descriçêo para YouTube (2-3 parágrafos, com hashtags relevantes, CTA)",
   "titulo_instagram": "Título/caption para Instagram Reels (max 2200 chars, com emojis e hashtags)",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
   "categoria": "número da categoria YouTube (22=People, 24=Entertainment, 27=Education, 28=Science)",
@@ -489,7 +489,7 @@ GERE (em JSON):
 
 REGRAS:
 - Títulos devem ser atrativos e gerar curiosidade
-- Descrições devem ser naturais, não parecer geradas por IA
+- Descrições devem ser naturais, nêo parecer geradas por IA
 - Tags relevantes ao conteúdo
 - Manter o tom e estilo do vídeo original
 - Incluir hashtags populares relacionadas
@@ -678,7 +678,7 @@ async function openReviewModal(videoId) {
   const data = await api(`/api/video?id=${videoId}`);
 
   if (!data.description) {
-    alert('Vídeo ainda não foi analisado');
+    alert('Vídeo ainda nêo foi analisado');
     return;
   }
 
@@ -732,7 +732,7 @@ async function publishFromModal() {
   } else {
     btn.textContent = 'Erro';
     btn.style.background = '#742a2a';
-    alert(res.error || 'Erro na publicação');
+    alert(res.error || 'Erro na publicaçêo');
   }
 }
 
@@ -826,7 +826,7 @@ async function publishVideo(videoId) {
   } else {
     btn.textContent = 'Erro';
     btn.style.background = '#742a2a';
-    alert(res.error || 'Erro na publicação');
+    alert(res.error || 'Erro na publicaçêo');
   }
 }
 
@@ -887,7 +887,7 @@ async function changePrivacy(videoId, ytVideoId, privacy) {
 }
 
 async function deletePublication(videoId, ytVideoId) {
-  if (!confirm(`Deletar publicação ${videoId.slice(-8)} do YouTube e voltar para analyzed?`)) return;
+  if (!confirm(`Deletar publicaçêo ${videoId.slice(-8)} do YouTube e voltar para analyzed?`)) return;
   await api('/api/publication/delete', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -934,7 +934,7 @@ async function loadPublicados() {
   const pubs = await api('/api/publicados');
   const tbody = document.getElementById('pub-table');
   if (!pubs.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#555;padding:40px;">Nenhuma publicação ainda.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#555;padding:40px;">Nenhuma publicaçêo ainda.</td></tr>';
     return;
   }
   tbody.innerHTML = pubs.filter(p => p.video_id).map(p => {

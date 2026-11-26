@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-tktk Scheduler — Automação de sync/analyze/publish
+tktk Scheduler — Automaçêo de sync/analyze/publish
 Roda em loop, checa a cada minuto se está na hora de executar.
-Lê configuração da planilha CONFIG.
+Lê configuraçêo da planilha CONFIG.
 """
 
 import json
@@ -135,7 +135,7 @@ def pipeline_sync(config):
     """Fila 1: Sincroniza metadados do TikTok (rápido, sem download)."""
     channel = config.get('tiktok_channel', '')
     if not channel:
-        log('  Sync: canal não configurado')
+        log('  Sync: canal nêo configurado')
         return
 
     log(f'  Sync: {channel}')

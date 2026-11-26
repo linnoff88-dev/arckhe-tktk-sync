@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # lib-sheets.sh — Funções para Google Sheets API
-# Segue o mesmo padrão do yt-pub-lives2
+# Segue o mesmo padrêo do yt-pub-lives2
 #
 # Requer no .env:
 #   CLIENT_ID, CLIENT_SECRET, SPREADSHEET_ID
@@ -9,12 +9,12 @@
 #
 # Uso: source lib-sheets.sh
 
-# --- Configuração ---
+# --- Configuraçêo ---
 LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_PROJECT_DIR="$(cd "$LIB_DIR/.." && pwd)"
 LIB_CONFIG_DIR="${LIB_PROJECT_DIR}/config"
 
-# Carrega .env se não foi carregado
+# Carrega .env se nêo foi carregado
 if [[ -f "${LIB_CONFIG_DIR}/.env" ]]; then
   set -a; source "${LIB_CONFIG_DIR}/.env"; set +a
 fi
@@ -118,7 +118,7 @@ print(json.dumps({
 sheets_find_row() {
   # Busca uma linha por valor na coluna A (video_id)
   # Uso: sheets_find_row "VIDEOS" "7616875015815826718"
-  # Retorna: número da linha (2, 3, ...) ou vazio se não encontrou
+  # Retorna: número da linha (2, 3, ...) ou vazio se nêo encontrou
   local sheet="$1"
   local video_id="$2"
 

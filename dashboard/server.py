@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """tktk Dashboard — Gerenciamento de sync TikTok → YouTube/Instagram
-Segue o padrão do yt-pub-lives2: Python stdlib HTTP server + Google Sheets API
+Segue o padrêo do yt-pub-lives2: Python stdlib HTTP server + Google Sheets API
 """
 
 import http.server
@@ -168,7 +168,7 @@ def api_videos():
 
 
 def api_config():
-    """Retorna configuração da planilha."""
+    """Retorna configuraçêo da planilha."""
     data = sheets_get('CONFIG!A2:B20')
     rows = data.get('values', [])
     config = {}
@@ -179,7 +179,7 @@ def api_config():
 
 
 def api_config_update(body):
-    """Atualiza configuração na planilha."""
+    """Atualiza configuraçêo na planilha."""
     key = body.get('key')
     value = body.get('value')
     if not key:
@@ -193,7 +193,7 @@ def api_config_update(body):
             sheets_update(f'CONFIG!B{i+2}', [[value]])
             return {'ok': True, 'key': key, 'value': value}
 
-    # Se não existe, adiciona
+    # Se nêo existe, adiciona
     sheets_append('CONFIG!A:B', [[key, value]])
     return {'ok': True, 'key': key, 'value': value, 'created': True}
 
@@ -325,7 +325,7 @@ def api_change_privacy(body):
 
 
 def api_delete_publication(body):
-    """Deleta publicação do YouTube e remove da planilha."""
+    """Deleta publicaçêo do YouTube e remove da planilha."""
     video_id = body.get('video_id')
     yt_video_id = body.get('yt_video_id', '')
     if not video_id:
@@ -460,7 +460,7 @@ def api_analyze(body):
 
 
 def api_publish(body):
-    """Dispara publicação de um vídeo em background."""
+    """Dispara publicaçêo de um vídeo em background."""
     video_id = body.get('video_id')
     platform = body.get('platform', 'youtube')
     privacy = body.get('privacy', '')
@@ -489,7 +489,7 @@ def api_publish(body):
     thread = threading.Thread(target=run_publish, daemon=True)
     thread.start()
 
-    return {'ok': True, 'message': f'Publicação iniciada para {video_id} ({platform})'}
+    return {'ok': True, 'message': f'Publicaçêo iniciada para {video_id} ({platform})'}
 
 
 # --- HTTP Server ---
